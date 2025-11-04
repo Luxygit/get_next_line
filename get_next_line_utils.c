@@ -6,9 +6,11 @@
 /*   By: dievarga <dievarga@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 13:35:36 by dievarga          #+#    #+#             */
-/*   Updated: 2025/10/30 18:29:26 by dievarga         ###   ########.fr       */
+/*   Updated: 2025/11/03 20:36:19 by dievarga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include "get_next_line.h"
 
 size_t	ft_strlen(char *s)
 {
@@ -20,7 +22,7 @@ size_t	ft_strlen(char *s)
 	return (count);
 }
 
-char *ft_strjoin(char const *s1, char const *s2)
+char	*ft_strjoin(char const *s1, char const *s2)
 {
 	char	*joint;
 	size_t	len1;
@@ -29,8 +31,8 @@ char *ft_strjoin(char const *s1, char const *s2)
 
 	if (!s1 && !s2)
 		return (NULL);
-	len1 = ft_strlen(s1);
-	len2 = ft_strlen(s2);
+	len1 = ft_strlen((char *)s1);
+	len2 = ft_strlen((char *)s2);
 	joint = malloc(len1 + len2 + 1);
 	if (!joint)
 		return (NULL);
