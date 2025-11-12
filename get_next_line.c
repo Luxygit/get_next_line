@@ -6,14 +6,11 @@
 /*   By: dievarga <dievarga@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 12:43:28 by dievarga          #+#    #+#             */
-/*   Updated: 2025/11/12 03:04:15 by dievarga         ###   ########.fr       */
+/*   Updated: 2025/11/12 16:06:24 by dievarga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#ifndef BUFFER_SIZE
-# define BUFFER_SIZE 2
-#endif
 
 static char	*ft_find(char **heap)
 {
@@ -67,13 +64,7 @@ char	*get_next_line(int fd)
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	r = ft_readfile(fd, &heap);
-	if (!heap || r < 0)
-	{
-		free (heap);
-		heap = NULL;
-		return (NULL);
-	}
-	if (*heap == '\0')
+	if (!heap || r < 0 || *heap == '\0')
 	{
 		free(heap);
 		heap = NULL;
@@ -83,20 +74,26 @@ char	*get_next_line(int fd)
 }
 
 /*
-getnextline function gets file decriptor and READS
- buffersize bytes. Then remembers the last buffer
- read.
-Read returns the amount of bytes read.
+getnextline function gets file decriptor and calls
+ ft_readfile to try to read the file an amount of 
+ buffersize bytes. 
+ 
+ *Read() remembers the last buffer read.
+ *Read returns the amount of bytes read in ssize_t.
+ -1 would mean an error when reading. permission
+ or bad fd.
 
-ft_read_line function takes the line string and
-measures length and allocates mem for it.
+ft_readfile function takes the fd and the heap mem 
+address(double pointer) so it can modify the value.
+It declares a buffer to store all to be read, a 
+tmp string 
 
 ft_build_line
 
+
 */
-
 #include <fcntl.h>
-
+#include <stdio.h>
 int	main(void)
 {
 	int		fd;
@@ -104,17 +101,19 @@ int	main(void)
 
 	fd = open("test.txt", O_RDONLY);
 //	fd = 0;
-	while ((line = get_next_line(fd)) != NULL)
+	line = get_next_line(fd);
+	while (line != NULL)
 	{
 		printf("%s", line);
 		free(line);
+		line = get_next_line(fd);
 	}
 	close(fd);
 	return (0);
 }
 
-/* 
+/*
 this main opens test.txt file and calls getnextline
 in a loop for every line of the file until the end.
-fd 1 or 2 (stdin stdout) should be read.
+fd 0 or 1 (stdin stdout) should be read.
 */
