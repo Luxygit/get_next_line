@@ -6,7 +6,7 @@
 /*   By: dievarga <dievarga@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 13:35:36 by dievarga          #+#    #+#             */
-/*   Updated: 2025/11/03 20:36:19 by dievarga         ###   ########.fr       */
+/*   Updated: 2025/11/12 02:06:09 by dievarga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,4 +47,53 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (joint);
 }
 
-//add one more trim??
+int	ft_strichr(const char *s, int c)
+{
+	int	i;
+
+	i = 0;
+	while (s[i] != '\0')
+	{
+		if (s[i] == (unsigned char)c)
+			return (i);
+		i++;
+	}
+	if ((unsigned char)c == '\0')
+		return (i);
+	return (-1);
+}
+
+static void	ft_strcpy(const char *s, char *d, size_t len)
+{
+	while (len--)
+		*d++ = *s++;
+	*d = '\0';
+}
+
+char	*ft_substr(char *s, unsigned int start, size_t len)
+{
+	char	*d;
+	char	*ret;
+	size_t	slen;
+
+	if (!s)
+		return (NULL);
+	slen = ft_strlen(s);
+	if (start >= slen)
+	{
+		d = malloc(1);
+		if (!d)
+			return (NULL);
+		d[0] = '\0';
+		return (d);
+	}
+	if (len > slen - start)
+		len = slen - start;
+	d = malloc (len + 1);
+	if (!d)
+		return (NULL);
+	ret = d;
+	s = s + start;
+	ft_strcpy(s, d, len);
+	return (ret);
+}

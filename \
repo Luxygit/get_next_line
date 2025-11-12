@@ -6,80 +6,51 @@
 /*   By: dievarga <dievarga@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 12:43:28 by dievarga          #+#    #+#             */
-/*   Updated: 2025/11/12 03:04:15 by dievarga         ###   ########.fr       */
+/*   Updated: 2025/11/04 17:06:01 by dievarga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 2
+# define BUFFER_SIZE 32
 #endif
-
-static char	*ft_find(char **heap)
-{
-	int		nl;
-	char	*line;
-	char	*rest;
-
-	nl = ft_strichr(*heap, '\n');
-	if (nl < 0)
-	{
-		line = ft_substr(*heap, 0, ft_strlen(*heap));
-		free(*heap);
-		*heap = NULL;
-		return (line);
-	}
-	line = ft_substr(*heap, 0, nl + 1);
-	rest = ft_substr(*heap, nl + 1, ft_strlen(*heap) - nl - 1);
-	free(*heap);
-	*heap = rest;
-	return (line);
-}
-
-static int	ft_readfile(int fd, char **heap)
-{
-	char	buf[BUFFER_SIZE + 1];
-	char	*tmp;
-	ssize_t	r;
-
-	r = 1;
-	while (r > 0 && (*heap == NULL || ft_strichr(*heap, '\n') < 0))
-	{
-		r = read(fd, buf, BUFFER_SIZE);
-		if (r <= 0)
-			break ;
-		buf[r] = '\0';
-		tmp = *heap;
-		if (!*heap)
-			*heap = ft_substr(buf, 0, r);
-		else
-			*heap = ft_strjoin(*heap, buf);
-		free(tmp);
-	}
-	return ((int)r);
-}
 
 char	*get_next_line(int fd)
 {
-	static char	*heap;
-	int			r;
+	char	*line;
+	int		i;
+	char	buffer[BUFFER_SIZE];
+	ssize_t	r;
+	int		j;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	line = malloc(BUFFER_SIZE + 1);
+	if (!line)
 		return (NULL);
-	r = ft_readfile(fd, &heap);
-	if (!heap || r < 0)
+	i = 0;
+	r = read(fd, buffer, BUFFER_SIZE);
+	while (r > 0)
 	{
-		free (heap);
-		heap = NULL;
+		j = 0;
+		while (j < r)
+		{
+			line[i] = buffer[j];
+			i++;
+			if (buffer[j] == '\n')
+			{
+				line[i] = '\0';
+				return (line);
+			}
+			j++;
+		}
+		r = read(fd, buffer, BUFFER_SIZE);
+	}
+	if (r == 0 && i == 0)
+	{
+		free(line);
 		return (NULL);
 	}
-	if (*heap == '\0')
-	{
-		free(heap);
-		heap = NULL;
-		return (NULL);
-	}
-	return (ft_find(&heap));
+	line[i] = '\0';
+	return (line);
 }
 
 /*
@@ -99,11 +70,10 @@ ft_build_line
 
 int	main(void)
 {
-	int		fd;
+	int	fd;
 	char	*line;
 
 	fd = open("test.txt", O_RDONLY);
-//	fd = 0;
 	while ((line = get_next_line(fd)) != NULL)
 	{
 		printf("%s", line);
