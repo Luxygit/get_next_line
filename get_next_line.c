@@ -6,7 +6,7 @@
 /*   By: dievarga <dievarga@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 12:43:28 by dievarga          #+#    #+#             */
-/*   Updated: 2025/11/12 16:06:24 by dievarga         ###   ########.fr       */
+/*   Updated: 2025/11/12 17:27:38 by dievarga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,10 +35,13 @@ static char	*ft_find(char **heap)
 
 static int	ft_readfile(int fd, char **heap)
 {
-	char	buf[BUFFER_SIZE + 1];
+	char	*buf;
 	char	*tmp;
 	ssize_t	r;
 
+	buf = malloc(BUFFER_SIZE + 1);
+	if (!buf)
+		return (-1);
 	r = 1;
 	while (r > 0 && (*heap == NULL || ft_strichr(*heap, '\n') < 0))
 	{
@@ -53,6 +56,7 @@ static int	ft_readfile(int fd, char **heap)
 			*heap = ft_strjoin(*heap, buf);
 		free(tmp);
 	}
+	free(buf);
 	return ((int)r);
 }
 
@@ -86,12 +90,22 @@ getnextline function gets file decriptor and calls
 ft_readfile function takes the fd and the heap mem 
 address(double pointer) so it can modify the value.
 It declares a buffer to store all to be read, a 
-tmp string 
+tmp string that we can use to free the old memory
+and a r that will be the number of bytes read.
+It starts with r=1 to run the loop once, then
+it keeps reading if the line is incomplete until
+it finds the first \n and modifies the heap
+accordingly.
+The mallocs get new memory from the stack mem
+instead of the heap so that it can use more mem
+in case the buff size is huge.
 
-ft_build_line
+ft_find just receives the updated heap and 
+depending if it finds /n or EOF extracts the complete
+line and the rest. Heap is freed and the rest is 
+saved on the new heap for the next line.
+Returns the line found. 
 
-
-*/
 #include <fcntl.h>
 #include <stdio.h>
 int	main(void)
@@ -112,8 +126,11 @@ int	main(void)
 	return (0);
 }
 
-/*
+
 this main opens test.txt file and calls getnextline
-in a loop for every line of the file until the end.
+in a loop for every line of the file until the end
+when getnextline returns NULL.
+Inside it should run get next line again so that it 
+moves to the next read block.
 fd 0 or 1 (stdin stdout) should be read.
 */
